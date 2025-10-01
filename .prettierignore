@@ -1,0 +1,28 @@
+# Dependencies
+node_modules
+dist
+coverage
+
+# IDE
+.idea
+.vscode
+
+# Build artifacts
+*.js.map
+*.d.ts
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Database
+*.sqlite
+*.db
+
+# OS
+.DS_Store
+Thumbs.db
