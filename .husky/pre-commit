@@ -1,0 +1,31 @@
+#!/usr/bin/env sh
+
+echo "🔍 Running pre-commit checks..."
+
+# Run lint-staged first to auto-format staged files
+if git diff --cached --name-only | grep -E '\.(ts|js)$' > /dev/null; then
+  echo "🎯 Running lint-staged on staged files..."
+  npm exec lint-staged
+fi
+
+# Run TypeScript compilation check after formatting
+if git diff --cached --name-only | grep -E '\.(ts|js)$' > /dev/null; then
+  echo "📝 Checking TypeScript compilation..."
+  if ! npm run build > /dev/null 2>&1; then
+    echo "❌ TypeScript compilation failed. Please fix the errors before committing."
+    npm run build
+    exit 1
+  fi
+fi
+
+# Run ESLint check after formatting
+if git diff --cached --name-only | grep -E '\.(ts|js)$' > /dev/null; then
+  echo "🔧 Running ESLint..."
+  if ! npm run lint:check > /dev/null 2>&1; then
+    echo "❌ ESLint found errors. Please fix them before committing."
+    npm run lint:check
+    exit 1
+  fi
+fi
+
+echo "✅ Pre-commit checks passed!"

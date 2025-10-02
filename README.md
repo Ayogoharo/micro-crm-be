@@ -47,44 +47,69 @@ The platform provides an **easy-to-use web application** where users can:
    - Free plan → ads enabled
    - Paid plans → no ads, extra features
 
-## Project Setup
+## Getting Started
 
-```bash
-# Install dependencies
-npm install
+### Prerequisites
 
-# Start PostgreSQL database
-docker compose up -d
+- **Node.js** v18+ (use nvm for version management)
+- **Docker** & Docker Compose v2+
+- **Git**
 
-# Run database migrations (after Task 1.4)
-npm run migration:run
-```
+### Quick Start
+
+1. **Clone the repository** (if not already done)
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Setup environment variables**
+   ```bash
+   cp .env.example .env
+   ```
+   Edit `.env` and update values as needed (defaults work for local development)
+
+4. **Start the PostgreSQL database**
+   ```bash
+   docker compose up -d
+   ```
+
+5. **Run database migrations**
+   ```bash
+   npm run migration:run
+   ```
+
+6. **Start the development server**
+   ```bash
+   npm run start:dev
+   ```
+
+The API will be available at `http://localhost:3000`
 
 ## Environment Variables
 
+All environment variables are **validated at startup** using `class-validator`. The application will refuse to start if any required variable is missing or invalid.
+
 Copy `.env.example` to `.env` and configure:
 
-```bash
-# Application
-NODE_ENV=development
-PORT=3000
+| Variable | Description | Default | Required |
+|----------|-------------|---------|----------|
+| `NODE_ENV` | Application environment | `development` | Yes |
+| `PORT` | Application port | `3000` | Yes |
+| `DATABASE_HOST` | PostgreSQL host | `localhost` | Yes |
+| `DATABASE_PORT` | PostgreSQL port | `5434` | Yes |
+| `DATABASE_USER` | Database username | `postgres` | Yes |
+| `DATABASE_PASSWORD` | Database password | `postgres` | Yes |
+| `DATABASE_NAME` | Database name | `micro_crm` | Yes |
+| `JWT_SECRET` | JWT signing secret | - | Yes |
+| `JWT_EXPIRES_IN` | JWT token expiration | `7d` | Yes |
+| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:5173` | Yes |
 
-# Database (Docker PostgreSQL)
-DATABASE_HOST=localhost
-DATABASE_PORT=5434
-DATABASE_USER=postgres
-DATABASE_PASSWORD=postgres
-DATABASE_NAME=micro_crm
-
-# JWT
-JWT_SECRET=your-secret-key-change-in-production
-JWT_EXPIRES_IN=7d
-
-# CORS
-CORS_ORIGIN=http://localhost:5173
-```
-
-**Note:** PostgreSQL runs on port **5434** to avoid conflicts with local instances.
+**Important Notes:**
+- PostgreSQL runs on port **5434** (not default 5432) to avoid conflicts with local instances
+- `JWT_SECRET` should be a strong random string in production
+- Validation schema is defined in `src/config/env.validation.ts`
 
 ## Development
 
@@ -135,24 +160,73 @@ npm run test:e2e
 npm run test:debug
 ```
 
-## Database Commands
+## Database Management
+
+### Docker Commands
 
 ```bash
-# Start database
+# Start PostgreSQL container
 docker compose up -d
 
-# Stop database
+# Stop and remove containers
 docker compose down
 
-# View logs
+# View PostgreSQL logs
 docker compose logs postgres
 
-# Access database CLI
-docker exec micro-crm-postgres psql -U postgres -d micro_crm
+# Follow logs in real-time
+docker compose logs -f postgres
 
 # Check container status
 docker compose ps
+
+# Restart PostgreSQL
+docker compose restart postgres
 ```
+
+### Database Access
+
+```bash
+# Connect to PostgreSQL CLI
+docker exec -it micro-crm-postgres psql -U postgres -d micro_crm
+
+# Run SQL file
+docker exec -i micro-crm-postgres psql -U postgres -d micro_crm < script.sql
+
+# Create database backup
+docker exec micro-crm-postgres pg_dump -U postgres micro_crm > backup.sql
+
+# Restore database backup
+docker exec -i micro-crm-postgres psql -U postgres -d micro_crm < backup.sql
+```
+
+### TypeORM Migrations
+
+**Important:** Always use migrations (not `synchronize: true`) for database schema changes.
+
+```bash
+# Generate migration from entity changes
+npm run migration:generate src/migrations/MigrationName
+
+# Create empty migration file
+npm run migration:create src/migrations/MigrationName
+
+# Run pending migrations
+npm run migration:run
+
+# Revert last migration
+npm run migration:revert
+
+# Show migration status
+npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
+```
+
+**Migration Workflow:**
+1. Create/modify entities in `src/**/*.entity.ts`
+2. Generate migration: `npm run migration:generate src/migrations/AddUserTable`
+3. Review generated migration file
+4. Run migration: `npm run migration:run`
+5. Commit migration file to git
 
 ## Sprint 1: Foundation + Auth + Clients
 
@@ -202,21 +276,98 @@ docker compose ps
 
 See `backend_todo.txt` for detailed task breakdown and progress tracking.
 
-**Completed:**
-- ✅ Task 1.1: Initialize NestJS project with TypeScript
-- ✅ Task 1.2: Setup environment configuration
-- ✅ Task 1.3: Configure Docker Compose
+### Phase 1: Project Setup & Infrastructure ✅
 
-**Next:**
-- Task 1.4: Setup TypeORM
-- Task 1.5: Configure code quality tools
-- Task 1.6: Create comprehensive README
+- ✅ Task 1.1: Initialize NestJS project with TypeScript
+- ✅ Task 1.2: Setup environment configuration with validation
+- ✅ Task 1.3: Configure Docker Compose with PostgreSQL
+- ✅ Task 1.4: Setup TypeORM with migrations
+- ✅ Task 1.5: Configure code quality tools (ESLint, Prettier, Husky)
+- ✅ Task 1.6: Create comprehensive README
+
+### Next Phase: Authentication System
+
+- Task 2.1: Create User entity
+- Task 2.2: Generate and run User migration
+- Task 2.3: Create Auth module structure
+- Task 2.4-2.9: Implement authentication endpoints and JWT strategy
+
+## Project Structure
+
+```
+micro-crm-be/
+├── src/
+│   ├── config/               # Configuration files
+│   │   └── env.validation.ts # Environment variable validation
+│   ├── migrations/           # TypeORM migrations
+│   ├── app.module.ts         # Root application module
+│   ├── main.ts               # Application entry point
+│   └── data-source.ts        # TypeORM DataSource configuration
+├── test/                     # E2E tests
+├── .husky/                   # Git hooks
+├── docker-compose.yml        # PostgreSQL container configuration
+├── .env.example              # Environment variables template
+└── README.md                 # This file
+```
+
+## Code Quality & Git Hooks
+
+This project enforces code quality standards with:
+
+- **ESLint**: TypeScript linting with recommended rules
+- **Prettier**: Consistent code formatting
+- **Husky**: Git hooks for pre-commit validation
+- **lint-staged**: Runs linters only on staged files
+
+**Pre-commit hook automatically:**
+1. Runs ESLint with auto-fix on staged `.ts` files
+2. Formats code with Prettier
+3. Blocks commit if there are errors
+
+## Troubleshooting
+
+### Port 5434 already in use
+```bash
+# Find process using the port
+lsof -i :5434
+
+# Change port in docker-compose.yml and .env
+# Update DATABASE_PORT in both files
+```
+
+### Database connection errors
+```bash
+# Check PostgreSQL is running
+docker compose ps
+
+# View PostgreSQL logs
+docker compose logs postgres
+
+# Restart PostgreSQL
+docker compose restart postgres
+```
+
+### Migration errors
+```bash
+# Check migration status
+npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
+
+# Revert last migration if needed
+npm run migration:revert
+```
+
+### Husky hooks not working
+```bash
+# Reinstall Husky
+npm run prepare
+```
 
 ## Resources
 
 - [NestJS Documentation](https://docs.nestjs.com)
 - [TypeORM Documentation](https://typeorm.io)
 - [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Husky Documentation](https://typicode.github.io/husky/)
 
 ## License
 
