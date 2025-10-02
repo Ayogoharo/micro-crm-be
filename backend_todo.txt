@@ -39,28 +39,28 @@
 
 ### Phase 2: Authentication System
 
-- [ ] **Task 2.1** - Create User entity
+- [x] **Task 2.1** - Create User entity
   - Define User entity with TypeORM decorators
   - Add fields: id, email, passwordHash, provider, plan, createdAt, updatedAt
   - Add enum for authentication providers (LOCAL, GOOGLE)
   - Add enum for subscription plans (FREE, PRO)
   
-- [ ] **Task 2.2** - Generate and run User migration
+- [x] **Task 2.2** - Generate and run User migration
   - Create migration for users table
   - Add unique constraints on email
   - Run migration against database
   
-- [ ] **Task 2.3** - Create Auth module structure
+- [x] **Task 2.3** - Create Auth module structure
   - Generate auth module, controller, and service
   - Setup DTOs for registration and login
   - Add class-validator decorators for input validation
   
-- [ ] **Task 2.4** - Implement password hashing
+- [x] **Task 2.4** - Implement password hashing
   - Install bcrypt library
   - Create utility functions for hash and compare
   - Integrate into user creation flow
   
-- [ ] **Task 2.5** - Setup JWT strategy
+- [x] **Task 2.5** - Setup JWT strategy
   - Install @nestjs/jwt and @nestjs/passport
   - Configure JwtModule with secret and expiration
   - Create JWT strategy for token validation
