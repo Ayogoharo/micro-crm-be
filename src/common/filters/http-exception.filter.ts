@@ -9,13 +9,18 @@ import {
 import { Request, Response } from 'express';
 
 /**
- * Global HTTP Exception Filter
- * Standardizes error responses across the application
+ * Global HTTP exception filter that standardizes HTTP error responses across the application.
  */
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
 
+  /**
+   * Catches HTTP exceptions and formats them into standardized error responses.
+   *
+   * @param {HttpException} exception - The HTTP exception to handle
+   * @param {ArgumentsHost} host - The execution context host
+   */
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
@@ -53,12 +58,18 @@ export class HttpExceptionFilter implements ExceptionFilter {
 }
 
 /**
- * Global Exception Filter for all unhandled exceptions
+ * Global exception filter that catches all unhandled exceptions and formats them into standardized error responses.
  */
 @Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   private readonly logger = new Logger(AllExceptionsFilter.name);
 
+  /**
+   * Catches all exceptions (HTTP and non-HTTP) and formats them into standardized error responses.
+   *
+   * @param {unknown} exception - The exception to handle
+   * @param {ArgumentsHost} host - The execution context host
+   */
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();

@@ -13,13 +13,22 @@ import { JwtAuthGuard } from './guards';
 import { CurrentUser } from './decorators';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 
+/**
+ * Controller for authentication endpoints including registration, login, and profile access.
+ */
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   /**
-   * Register a new user
-   * POST /auth/register
+   * Registers a new user account with email and password.
+   *
+   * @param {RegisterDto} registerDto - Registration data containing email and password
+   *
+   * @returns {Promise<object>} A promise that resolves with the created user data
+   *
+   * @throws {ConflictException} If email already exists in database
+   * @throws {BadRequestException} If validation fails
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
@@ -28,8 +37,14 @@ export class AuthController {
   }
 
   /**
-   * Login user and return JWT token
-   * POST /auth/login
+   * Authenticates a user and returns a JWT access token.
+   *
+   * @param {LoginDto} loginDto - Login credentials containing email and password
+   *
+   * @returns {Promise<object>} A promise that resolves with access token and user data
+   *
+   * @throws {UnauthorizedException} If credentials are invalid
+   * @throws {BadRequestException} If validation fails
    */
   @Post('login')
   @HttpCode(HttpStatus.OK)
@@ -38,8 +53,11 @@ export class AuthController {
   }
 
   /**
-   * Get current user profile (protected route)
-   * GET /auth/profile
+   * Retrieves the current authenticated user's profile information.
+   *
+   * @param {JwtPayload} user - The authenticated user extracted from JWT token
+   *
+   * @returns {object} An object containing the user's ID and email
    */
   @Get('profile')
   @UseGuards(JwtAuthGuard)

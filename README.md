@@ -173,19 +173,16 @@ npm run test:debug
 **Postman Collection** is available in the `postman/` directory with automatic JWT token management.
 
 📁 **Files:**
-
-- `postman/Micro-CRM-Backend.postman_collection.json` - API collection
+- `postman/Micro-CRM-Backend.postman_collection.json` - API collection with built-in documentation
 - `postman/Micro-CRM-Backend.postman_environment.json` - Environment variables
-- `postman/README.md` - Detailed usage guide
 
 **Quick Start:**
-
 1. Import both JSON files into Postman
 2. Select "Micro CRM Backend - Local" environment
-3. Run "Auth / Login" request
-4. JWT token is automatically saved and used for all protected endpoints
+3. **Click on collection name** to see complete documentation
+4. Run "Auth / Login" request - JWT token is automatically saved!
 
-See [postman/README.md](postman/README.md) for detailed instructions.
+See [postman/README.md](postman/README.md) for technical details.
 
 **Available Endpoints:**
 

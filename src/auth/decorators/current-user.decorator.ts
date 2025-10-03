@@ -2,8 +2,9 @@ import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 /**
- * Custom decorator to extract the current user from the request
- * Usage: @CurrentUser() user: JwtPayload
+ * Custom parameter decorator that extracts the authenticated user's JWT payload from the request.
+ *
+ * @returns {JwtPayload} The JWT payload containing user ID and email
  */
 export const CurrentUser = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): JwtPayload => {
