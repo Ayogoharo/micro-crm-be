@@ -1,0 +1,230 @@
+{
+	"info": {
+		"_postman_id": "micro-crm-backend-v1",
+		"name": "Micro CRM Backend",
+		"description": "Complete API collection for Micro CRM Backend - Local Services CRM for freelancers and small businesses.\n\n**Features:**\n- Automatic JWT token management\n- Built-in test assertions\n- Environment variable auto-save\n- Console logging for debugging\n\n**Usage:**\n1. Import collection and environment files\n2. Select \"Micro CRM Backend - Local\" environment\n3. Start backend server (`npm run start:dev`)\n4. Run requests - tokens are managed automatically!\n\n**Current Phase:** Sprint 1 - Authentication System Complete ✅",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Get API Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "/**\n * Verifies the API server is running and responsive.\n * \n * @endpoint GET /\n * @auth None\n * \n * @returns {string} 200 - Welcome message\n */"
+					},
+					"response": []
+				}
+			],
+			"description": "Health check endpoints to verify API availability and status."
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatically save user data if registration is successful",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('user_id', response.user.id);",
+									"    pm.environment.set('user_email', response.user.email);",
+									"    pm.environment.set('user_plan', response.user.plan);",
+									"    console.log('✅ User registered successfully');",
+									"    console.log('User ID:', response.user.id);",
+									"    console.log('Email:', response.user.email);",
+									"    console.log('Plan:', response.user.plan);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "/**\n * Registers a new user account with email and password.\n * \n * @endpoint POST /auth/register\n * @auth None\n * \n * @param {object} body - Registration data\n * @param {string} body.email - User email (must be unique)\n * @param {string} body.password - User password (minimum 8 characters)\n * \n * @returns {object} 201 - User created successfully\n * @returns {object} 201.user - User data\n * @returns {string} 201.user.id - User UUID\n * @returns {string} 201.user.email - User email\n * @returns {string} 201.user.plan - Subscription plan (FREE/PRO)\n * \n * @throws {ConflictException} 409 - Email already registered\n * @throws {BadRequestException} 400 - Validation failed\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatically save JWT token if login is successful",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('access_token', response.access_token);",
+									"    pm.environment.set('user_id', response.user.id);",
+									"    pm.environment.set('user_email', response.user.email);",
+									"    pm.environment.set('user_plan', response.user.plan);",
+									"    console.log('✅ Login successful');",
+									"    console.log('Token saved to environment');",
+									"    console.log('User ID:', response.user.id);",
+									"    console.log('Email:', response.user.email);",
+									"}",
+									"",
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has access_token', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('access_token');",
+									"});",
+									"",
+									"pm.test('Response has user object', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('user');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "/**\n * Authenticates user and returns JWT access token.\n * \n * @endpoint POST /auth/login\n * @auth None\n * \n * @param {object} body - Login credentials\n * @param {string} body.email - User email\n * @param {string} body.password - User password\n * \n * @returns {object} 200 - Login successful\n * @returns {string} 200.access_token - JWT token for authentication\n * @returns {object} 200.user - User data\n * @returns {string} 200.user.id - User UUID\n * @returns {string} 200.user.email - User email\n * @returns {string} 200.user.plan - Subscription plan\n * \n * @throws {UnauthorizedException} 401 - Invalid credentials\n * @throws {BadRequestException} 400 - Validation failed\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Protected)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has userId', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('userId');",
+									"});",
+									"",
+									"pm.test('Response has email', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						},
+						"description": "/**\n * Retrieves current authenticated user's profile information.\n * \n * @endpoint GET /auth/profile\n * @auth Bearer Token (JWT)\n * \n * @returns {object} 200 - User profile data\n * @returns {string} 200.userId - User UUID from JWT payload\n * @returns {string} 200.email - User email from JWT payload\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n */"
+					},
+					"response": []
+				}
+			],
+			"description": "/**\n * Authentication endpoints for user registration, login, and profile access.\n * \n * @folder Authentication\n */"
+		},
+		{
+			"name": "Clients (Coming Soon)",
+			"item": [],
+			"description": "/**\n * Client management endpoints (Phase 3 - In Development)\n * \n * @folder Clients\n */"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"console.log('📡 Request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"console.log('📥 Response status:', pm.response.code, pm.response.status);",
+					"",
+					"if (pm.response.code >= 400) {",
+					"    console.error('❌ Error response:', pm.response.json());",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}

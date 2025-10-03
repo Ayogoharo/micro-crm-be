@@ -5,3 +5,6 @@ dist
 node_modules
 CLAUDE.md
 package-lock.json
+
+# Documentation (private roadmap)
+docs/roadmap.md

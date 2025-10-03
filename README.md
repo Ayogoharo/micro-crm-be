@@ -60,22 +60,27 @@ The platform provides an **easy-to-use web application** where users can:
 1. **Clone the repository** (if not already done)
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Setup environment variables**
+
    ```bash
    cp .env.example .env
    ```
+
    Edit `.env` and update values as needed (defaults work for local development)
 
 4. **Start the PostgreSQL database**
+
    ```bash
    docker compose up -d
    ```
 
 5. **Run database migrations**
+
    ```bash
    npm run migration:run
    ```
@@ -93,20 +98,21 @@ All environment variables are **validated at startup** using `class-validator`. 
 
 Copy `.env.example` to `.env` and configure:
 
-| Variable | Description | Default | Required |
-|----------|-------------|---------|----------|
-| `NODE_ENV` | Application environment | `development` | Yes |
-| `PORT` | Application port | `3000` | Yes |
-| `DATABASE_HOST` | PostgreSQL host | `localhost` | Yes |
-| `DATABASE_PORT` | PostgreSQL port | `5434` | Yes |
-| `DATABASE_USER` | Database username | `postgres` | Yes |
-| `DATABASE_PASSWORD` | Database password | `postgres` | Yes |
-| `DATABASE_NAME` | Database name | `micro_crm` | Yes |
-| `JWT_SECRET` | JWT signing secret | - | Yes |
-| `JWT_EXPIRES_IN` | JWT token expiration | `7d` | Yes |
-| `CORS_ORIGIN` | Allowed CORS origin | `http://localhost:5173` | Yes |
+| Variable            | Description             | Default                 | Required |
+| ------------------- | ----------------------- | ----------------------- | -------- |
+| `NODE_ENV`          | Application environment | `development`           | Yes      |
+| `PORT`              | Application port        | `3000`                  | Yes      |
+| `DATABASE_HOST`     | PostgreSQL host         | `localhost`             | Yes      |
+| `DATABASE_PORT`     | PostgreSQL port         | `5434`                  | Yes      |
+| `DATABASE_USER`     | Database username       | `postgres`              | Yes      |
+| `DATABASE_PASSWORD` | Database password       | `postgres`              | Yes      |
+| `DATABASE_NAME`     | Database name           | `micro_crm`             | Yes      |
+| `JWT_SECRET`        | JWT signing secret      | -                       | Yes      |
+| `JWT_EXPIRES_IN`    | JWT token expiration    | `7d`                    | Yes      |
+| `CORS_ORIGIN`       | Allowed CORS origin     | `http://localhost:5173` | Yes      |
 
 **Important Notes:**
+
 - PostgreSQL runs on port **5434** (not default 5432) to avoid conflicts with local instances
 - `JWT_SECRET` should be a strong random string in production
 - Validation schema is defined in `src/config/env.validation.ts`
@@ -143,6 +149,8 @@ npm run format
 
 ## Testing
 
+### Automated Tests
+
 ```bash
 # Run unit tests
 npm run test
@@ -159,6 +167,29 @@ npm run test:e2e
 # Debug tests
 npm run test:debug
 ```
+
+### Manual API Testing with Postman
+
+**Postman Collection** is available in the `postman/` directory with automatic JWT token management.
+
+📁 **Files:**
+- `postman/Micro-CRM-Backend.postman_collection.json` - API collection with built-in documentation
+- `postman/Micro-CRM-Backend.postman_environment.json` - Environment variables
+
+**Quick Start:**
+1. Import both JSON files into Postman
+2. Select "Micro CRM Backend - Local" environment
+3. **Click on collection name** to see complete documentation
+4. Run "Auth / Login" request - JWT token is automatically saved!
+
+See [postman/README.md](postman/README.md) for technical details.
+
+**Available Endpoints:**
+
+- ✅ `POST /auth/register` - Register new user
+- ✅ `POST /auth/login` - Login and get JWT token
+- ✅ `GET /auth/profile` - Get current user (protected)
+- ⏳ Clients CRUD endpoints (coming in Phase 3)
 
 ## Database Management
 
@@ -222,6 +253,7 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
 ```
 
 **Migration Workflow:**
+
 1. Create/modify entities in `src/**/*.entity.ts`
 2. Generate migration: `npm run migration:generate src/migrations/AddUserTable`
 3. Review generated migration file
@@ -235,6 +267,7 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
 ### Day 1 (Backend Setup & Auth)
 
 **Tasks:**
+
 - ✅ Init NestJS project with TypeORM + Postgres (2h)
   - Setup configuration with `.env`
   - Migrations ready
@@ -248,6 +281,7 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
   - Update `README.md`
 
 **Acceptance Criteria (Day 1):**
+
 - ✅ Can run backend + DB with `docker-compose up`
 - [ ] Auth endpoints return JWT on successful login
 - ✅ Project follows linting & formatting rules
@@ -255,6 +289,7 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
 ### Day 2 (Clients Module)
 
 **Tasks:**
+
 - [ ] Create `Client` entity with relation to `User` (2h)
   - Fields: id, name, email, phone, notes, createdAt, updatedAt
 - [ ] Implement CRUD endpoints for clients (3h)
@@ -268,13 +303,10 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
   - Swagger docs at `/api` for auth & clients
 
 **Acceptance Criteria (Day 2):**
+
 - [ ] Authenticated users can CRUD their clients
 - [ ] Swagger docs available and up-to-date
 - [ ] Errors return clear validation messages
-
-## Current Progress
-
-See `backend_todo.txt` for detailed task breakdown and progress tracking.
 
 ### Phase 1: Project Setup & Infrastructure ✅
 
@@ -285,28 +317,59 @@ See `backend_todo.txt` for detailed task breakdown and progress tracking.
 - ✅ Task 1.5: Configure code quality tools (ESLint, Prettier, Husky)
 - ✅ Task 1.6: Create comprehensive README
 
-### Next Phase: Authentication System
+### Phase 2: Authentication System ✅
 
-- Task 2.1: Create User entity
-- Task 2.2: Generate and run User migration
-- Task 2.3: Create Auth module structure
-- Task 2.4-2.9: Implement authentication endpoints and JWT strategy
+- ✅ Task 2.1: Create User entity
+- ✅ Task 2.2: Generate and run User migration
+- ✅ Task 2.3: Create Auth module structure
+- ✅ Task 2.4: Implement password hashing
+- ✅ Task 2.5: Setup JWT strategy
+- ✅ Task 2.6: Implement registration endpoint
+- ✅ Task 2.7: Implement login endpoint
+- ✅ Task 2.8: Create authentication guard
+- ✅ Task 2.9: Add error handling
+
+### Next Phase: Clients Module
+
+- Task 3.1: Create Client entity
+- Task 3.2: Generate and run Client migration
+- Task 3.3-3.10: Implement Clients CRUD endpoints
 
 ## Project Structure
 
 ```
 micro-crm-be/
 ├── src/
+│   ├── auth/                 # Authentication module
+│   │   ├── dto/              # Data transfer objects
+│   │   ├── guards/           # JWT auth guard
+│   │   ├── decorators/       # Custom decorators (@CurrentUser)
+│   │   ├── strategies/       # Passport JWT strategy
+│   │   ├── interfaces/       # JWT payload interface
+│   │   └── utils/            # Password hashing utilities
+│   ├── users/                # Users module
+│   │   ├── entities/         # User entity
+│   │   ├── enums/            # AuthProvider, SubscriptionPlan
+│   │   └── users.service.ts  # Users service
+│   ├── common/               # Shared resources
+│   │   └── filters/          # Exception filters
 │   ├── config/               # Configuration files
 │   │   └── env.validation.ts # Environment variable validation
 │   ├── migrations/           # TypeORM migrations
 │   ├── app.module.ts         # Root application module
 │   ├── main.ts               # Application entry point
 │   └── data-source.ts        # TypeORM DataSource configuration
+├── postman/                  # Postman collection for API testing
+│   ├── Micro-CRM-Backend.postman_collection.json
+│   ├── Micro-CRM-Backend.postman_environment.json
+│   └── README.md
+├── docs/                     # Documentation
+│   └── roadmap.md            # Project roadmap (private)
 ├── test/                     # E2E tests
 ├── .husky/                   # Git hooks
 ├── docker-compose.yml        # PostgreSQL container configuration
 ├── .env.example              # Environment variables template
+├── AUTHENTICATION_SUMMARY.md # Authentication implementation details
 └── README.md                 # This file
 ```
 
@@ -320,6 +383,7 @@ This project enforces code quality standards with:
 - **lint-staged**: Runs linters only on staged files
 
 **Pre-commit hook automatically:**
+
 1. Runs ESLint with auto-fix on staged `.ts` files
 2. Formats code with Prettier
 3. Blocks commit if there are errors
@@ -327,6 +391,7 @@ This project enforces code quality standards with:
 ## Troubleshooting
 
 ### Port 5434 already in use
+
 ```bash
 # Find process using the port
 lsof -i :5434
@@ -336,6 +401,7 @@ lsof -i :5434
 ```
 
 ### Database connection errors
+
 ```bash
 # Check PostgreSQL is running
 docker compose ps
@@ -348,6 +414,7 @@ docker compose restart postgres
 ```
 
 ### Migration errors
+
 ```bash
 # Check migration status
 npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
@@ -357,6 +424,7 @@ npm run migration:revert
 ```
 
 ### Husky hooks not working
+
 ```bash
 # Reinstall Husky
 npm run prepare
