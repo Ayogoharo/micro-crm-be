@@ -1,0 +1,240 @@
+{
+	"info": {
+		"_postman_id": "micro-crm-backend-v1",
+		"name": "Micro CRM Backend",
+		"description": "Complete API collection for Micro CRM Backend - Local Services Management\n\n## Authentication\nMost endpoints require JWT authentication. The collection is configured to automatically:\n1. Store the JWT token after successful login\n2. Add the token to the Authorization header for protected endpoints\n\n## Usage\n1. Set up the environment variables (see Micro-CRM-Backend environment)\n2. Run the \"Auth / Register\" or \"Auth / Login\" request\n3. The JWT token will be automatically saved\n4. All protected endpoints will use the token automatically\n\n## Current Phase\n✅ Phase 1: Project Setup & Infrastructure\n✅ Phase 2: Authentication System\n⏳ Phase 3: Clients Module (Coming Soon)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Health Check",
+			"item": [
+				{
+					"name": "Get API Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": ["{{base_url}}"],
+							"path": [""]
+						},
+						"description": "Basic health check endpoint to verify the API is running."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for checking API health and status"
+		},
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register New User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatically save user data if registration is successful",
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    ",
+									"    // Save user ID and email for future requests",
+									"    pm.environment.set('user_id', response.user.id);",
+									"    pm.environment.set('user_email', response.user.email);",
+									"    pm.environment.set('user_plan', response.user.plan);",
+									"    ",
+									"    console.log('✅ User registered successfully');",
+									"    console.log('User ID:', response.user.id);",
+									"    console.log('Email:', response.user.email);",
+									"    console.log('Plan:', response.user.plan);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/register",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "register"]
+						},
+						"description": "Register a new user account.\n\n**Requirements:**\n- Email must be unique\n- Password must be at least 8 characters\n\n**Response:**\n- Returns user data (id, email, plan)\n- Does NOT return password hash"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Automatically save JWT token if login is successful",
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    ",
+									"    // Save the access token",
+									"    pm.environment.set('access_token', response.access_token);",
+									"    ",
+									"    // Save user data",
+									"    pm.environment.set('user_id', response.user.id);",
+									"    pm.environment.set('user_email', response.user.email);",
+									"    pm.environment.set('user_plan', response.user.plan);",
+									"    ",
+									"    console.log('✅ Login successful');",
+									"    console.log('Token saved to environment');",
+									"    console.log('User ID:', response.user.id);",
+									"    console.log('Email:', response.user.email);",
+									"}",
+									"",
+									"// Add test assertions",
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has access_token', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('access_token');",
+									"});",
+									"",
+									"pm.test('Response has user object', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('user');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"{{test_email}}\",\n  \"password\": \"{{test_password}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/login",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "login"]
+						},
+						"description": "Login with email and password.\n\n**Response:**\n- Returns JWT access_token\n- Returns user data (id, email, plan)\n- Token is automatically saved to environment variables"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile (Protected)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has userId', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('userId');",
+									"});",
+									"",
+									"pm.test('Response has email', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('email');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/profile",
+							"host": ["{{base_url}}"],
+							"path": ["auth", "profile"]
+						},
+						"description": "Get current user profile.\n\n**Authentication:** Required (JWT Bearer token)\n\n**Response:**\n- Returns userId and email from JWT payload"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user registration and login.\n\n**Flow:**\n1. Register a new user OR\n2. Login with existing credentials\n3. JWT token is automatically saved\n4. Use token for protected endpoints"
+		},
+		{
+			"name": "Clients (Coming Soon)",
+			"item": [],
+			"description": "Client management endpoints will be added in Phase 3.\n\nPlanned endpoints:\n- POST /clients - Create client\n- GET /clients - List clients (with pagination & search)\n- GET /clients/:id - Get single client\n- PATCH /clients/:id - Update client\n- DELETE /clients/:id - Delete client"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{access_token}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global pre-request script",
+					"console.log('📡 Request to:', pm.request.url.toString());"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Global test script",
+					"console.log('📥 Response status:', pm.response.code, pm.response.status);",
+					"",
+					"// Log errors for debugging",
+					"if (pm.response.code >= 400) {",
+					"    console.error('❌ Error response:', pm.response.json());",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
