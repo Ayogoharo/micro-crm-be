@@ -3,6 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
+  JoinColumn,
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -43,6 +44,7 @@ export class Client {
     nullable: false,
     onDelete: 'CASCADE',
   })
+  @JoinColumn({ name: 'userId' })
   user!: User;
 
   @Column({
