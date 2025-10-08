@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "micro-crm-backend-v1",
 		"name": "Micro CRM Backend",
-		"description": "Complete API collection for Micro CRM Backend - Local Services CRM for freelancers and small businesses.\n\n**Features:**\n- Automatic JWT token management\n- Built-in test assertions\n- Environment variable auto-save\n- Console logging for debugging\n\n**Usage:**\n1. Import collection and environment files\n2. Select \"Micro CRM Backend - Local\" environment\n3. Start backend server (`npm run start:dev`)\n4. Run requests - tokens are managed automatically!\n\n**Current Phase:** Sprint 1 - Authentication System Complete ✅",
+		"description": "Complete API collection for Micro CRM Backend - Local Services CRM for freelancers and small businesses.\n\n**Features:**\n- Automatic JWT token management\n- Built-in test assertions\n- Environment variable auto-save\n- Console logging for debugging\n\n**Usage:**\n1. Import collection and environment files\n2. Select \"Micro CRM Backend - Local\" environment\n3. Start backend server (`npm run start:dev`)\n4. Run requests - tokens are managed automatically!\n\n**Current Phase:** Sprint 1 - Phase 3 Complete ✅\n- Authentication System ✅\n- Clients Module with CRUD ✅",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
@@ -179,9 +179,295 @@
 			"description": "/**\n * Authentication endpoints for user registration, login, and profile access.\n * \n * @folder Authentication\n */"
 		},
 		{
-			"name": "Clients (Coming Soon)",
-			"item": [],
-			"description": "/**\n * Client management endpoints (Phase 3 - In Development)\n * \n * @folder Clients\n */"
+			"name": "Clients",
+			"item": [
+				{
+					"name": "Create Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    pm.environment.set('client_id', response.id);",
+									"    console.log('✅ Client created successfully');",
+									"    console.log('Client ID:', response.id);",
+									"    console.log('Name:', response.name);",
+									"}",
+									"",
+									"pm.test('Status code is 201', function() {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"pm.test('Response has client id', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"email\": \"john.doe@example.com\",\n  \"phone\": \"+1234567890\",\n  \"notes\": \"VIP client, prefers morning appointments\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/clients",
+							"host": ["{{base_url}}"],
+							"path": ["clients"]
+						},
+						"description": "/**\n * Creates a new client associated with the authenticated user.\n * \n * @endpoint POST /clients\n * @auth Bearer Token (JWT)\n * \n * @param {object} body - Client data\n * @param {string} body.name - Client name (required, max 255 chars)\n * @param {string} body.email - Client email (optional, must be valid email)\n * @param {string} body.phone - Client phone (optional, max 20 chars)\n * @param {string} body.notes - Additional notes (optional, max 1000 chars)\n * \n * @returns {object} 201 - Client created successfully\n * @returns {string} 201.id - Client UUID\n * @returns {string} 201.name - Client name\n * @returns {string} 201.email - Client email\n * @returns {string} 201.phone - Client phone\n * @returns {string} 201.notes - Client notes\n * @returns {string} 201.userId - Associated user ID\n * @returns {string} 201.createdAt - Creation timestamp\n * @returns {string} 201.updatedAt - Last update timestamp\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n * @throws {BadRequestException} 400 - Validation failed\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "List Clients",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has data array', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('data');",
+									"});",
+									"",
+									"pm.test('Response has pagination metadata', function() {",
+									"    const response = pm.response.json();",
+									"    pm.expect(response).to.have.property('total');",
+									"    pm.expect(response).to.have.property('page');",
+									"    pm.expect(response).to.have.property('limit');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/clients?page=1&limit=10",
+							"host": ["{{base_url}}"],
+							"path": ["clients"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Items per page (default: 10)"
+								},
+								{
+									"key": "search",
+									"value": "",
+									"description": "Search by client name (case-insensitive)",
+									"disabled": true
+								}
+							]
+						},
+						"description": "/**\n * Retrieves paginated list of clients for the authenticated user.\n * \n * @endpoint GET /clients\n * @auth Bearer Token (JWT)\n * \n * @param {number} query.page - Page number (optional, default: 1)\n * @param {number} query.limit - Items per page (optional, default: 10)\n * @param {string} query.search - Search by name (optional, case-insensitive)\n * \n * @returns {object} 200 - Paginated client list\n * @returns {array} 200.data - Array of client objects\n * @returns {number} 200.total - Total number of clients\n * @returns {number} 200.page - Current page number\n * @returns {number} 200.limit - Items per page\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "List Clients with Search",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/clients?search=John",
+							"host": ["{{base_url}}"],
+							"path": ["clients"],
+							"query": [
+								{
+									"key": "search",
+									"value": "John",
+									"description": "Search by client name (case-insensitive)"
+								}
+							]
+						},
+						"description": "/**\n * Search clients by name with case-insensitive partial matching.\n * \n * @endpoint GET /clients?search={query}\n * @auth Bearer Token (JWT)\n * \n * @param {string} query.search - Search query for client name\n * \n * @returns {object} 200 - Filtered client list with pagination\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Client by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has client id', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["clients", "{{client_id}}"]
+						},
+						"description": "/**\n * Retrieves a single client by ID.\n * \n * @endpoint GET /clients/:id\n * @auth Bearer Token (JWT)\n * \n * @param {string} path.id - Client UUID\n * \n * @returns {object} 200 - Client data\n * @returns {string} 200.id - Client UUID\n * @returns {string} 200.name - Client name\n * @returns {string} 200.email - Client email\n * @returns {string} 200.phone - Client phone\n * @returns {string} 200.notes - Client notes\n * @returns {string} 200.userId - Associated user ID\n * @returns {string} 200.createdAt - Creation timestamp\n * @returns {string} 200.updatedAt - Last update timestamp\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n * @throws {NotFoundException} 404 - Client not found or unauthorized\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test('Response has updated client data', function() {",
+									"    pm.expect(pm.response.json()).to.have.property('id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"notes\": \"Updated notes - Client prefers afternoon appointments\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["clients", "{{client_id}}"]
+						},
+						"description": "/**\n * Updates an existing client. Supports partial updates.\n * \n * @endpoint PATCH /clients/:id\n * @auth Bearer Token (JWT)\n * \n * @param {string} path.id - Client UUID\n * @param {object} body - Fields to update (all optional)\n * @param {string} body.name - Client name\n * @param {string} body.email - Client email\n * @param {string} body.phone - Client phone\n * @param {string} body.notes - Client notes\n * \n * @returns {object} 200 - Updated client data\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n * @throws {NotFoundException} 404 - Client not found or unauthorized\n * @throws {BadRequestException} 400 - Validation failed\n */"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Client",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test('Status code is 200', function() {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"console.log('✅ Client deleted successfully');"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{access_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/clients/{{client_id}}",
+							"host": ["{{base_url}}"],
+							"path": ["clients", "{{client_id}}"]
+						},
+						"description": "/**\n * Deletes a client permanently.\n * \n * @endpoint DELETE /clients/:id\n * @auth Bearer Token (JWT)\n * \n * @param {string} path.id - Client UUID\n * \n * @returns {void} 200 - Client deleted successfully\n * \n * @throws {UnauthorizedException} 401 - Missing or invalid token\n * @throws {NotFoundException} 404 - Client not found or unauthorized\n */"
+					},
+					"response": []
+				}
+			],
+			"description": "/**\n * Client management endpoints - CRUD operations for managing clients.\n * All endpoints require JWT authentication.\n * Clients are automatically scoped to the authenticated user.\n * \n * @folder Clients\n */"
 		}
 	],
 	"auth": {

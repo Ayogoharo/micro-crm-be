@@ -1,14 +1,31 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import type { JwtPayload } from '../interfaces/jwt-payload.interface';
+import { User } from '../../users/entities/user.entity';
 
 /**
- * Custom parameter decorator that extracts the authenticated user's JWT payload from the request.
+ * Custom parameter decorator that extracts the authenticated user from the request.
  *
- * @returns {JwtPayload} The JWT payload containing user ID and email
+ * @param property - Optional specific property to extract ('id' or 'email')
+ * @returns The user object, or user ID/email as string, or dates
+ *
+ * @example
+ * // Get full user object
+ * async getProfile(@CurrentUser() user: User) {}
+ *
+ * // Get only user ID
+ * async getClients(@CurrentUser('id') userId: string) {}
  */
 export const CurrentUser = createParamDecorator(
-  (_data: unknown, ctx: ExecutionContext): JwtPayload => {
-    const request = ctx.switchToHttp().getRequest<{ user: JwtPayload }>();
-    return request.user;
+  (
+    property: 'id' | 'email' | 'createdAt' | 'updatedAt' | undefined,
+    ctx: ExecutionContext,
+  ): User | string | Date => {
+    const request = ctx.switchToHttp().getRequest<{ user: User }>();
+    const user = request.user;
+
+    if (!property) {
+      return user;
+    }
+
+    return user[property];
   },
 );
