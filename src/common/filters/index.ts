@@ -1,4 +1,4 @@
 export {
   HttpExceptionFilter,
   AllExceptionsFilter,
-} from './http-exception.filter';
+} from 'src/common/filters/http-exception.filter';

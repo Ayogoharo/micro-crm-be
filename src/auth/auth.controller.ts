@@ -7,11 +7,11 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto';
-import { JwtAuthGuard } from './guards';
-import { CurrentUser } from './decorators';
-import type { JwtPayload } from './interfaces/jwt-payload.interface';
+import { AuthService } from 'src/auth/auth.service';
+import { RegisterDto, LoginDto } from 'src/auth/dto';
+import { JwtAuthGuard } from 'src/auth/guards';
+import { CurrentUser } from 'src/auth/decorators';
+import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 
 /**
  * Controller for authentication endpoints including registration, login, and profile access.

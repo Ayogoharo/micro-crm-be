@@ -1,2 +1,2 @@
-export * from './auth-provider.enum';
-export * from './subscription-plan.enum';
+export * from 'src/users/enums/auth-provider.enum';
+export * from 'src/users/enums/subscription-plan.enum';

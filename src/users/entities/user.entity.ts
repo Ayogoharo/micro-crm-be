@@ -6,9 +6,9 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { AuthProvider } from 'users/enums/auth-provider.enum';
-import { SubscriptionPlan } from 'users/enums/subscription-plan.enum';
-import type { Client } from 'clients/entities/client.entity';
+import { AuthProvider } from 'src/users/enums/auth-provider.enum';
+import { SubscriptionPlan } from 'src/users/enums/subscription-plan.enum';
+import type { Client } from 'src/clients/entities/client.entity';
 
 @Entity('users')
 export class User {
