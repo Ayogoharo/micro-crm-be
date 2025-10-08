@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 import { ClientsService } from './clients.service';
 import { CreateClientDto, UpdateClientDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { JwtAuthGuard } from 'auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'auth/decorators/current-user.decorator';
 
 @Controller('clients')
 @UseGuards(JwtAuthGuard)
