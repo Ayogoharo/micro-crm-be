@@ -92,6 +92,30 @@ The platform provides an **easy-to-use web application** where users can:
 
 The API will be available at `http://localhost:3000`
 
+## API Documentation (Swagger)
+
+Interactive API documentation is available via **Swagger UI** at:
+
+```
+http://localhost:3000/api
+```
+
+**Features:**
+- Complete API reference with request/response examples
+- Built-in authentication testing (JWT Bearer tokens)
+- Interactive "Try it out" functionality for all endpoints
+- Automatic validation documentation from DTOs
+
+**Quick Start:**
+1. Start the development server: `npm run start:dev`
+2. Open [http://localhost:3000/api](http://localhost:3000/api) in your browser
+3. Click "Authorize" and enter your JWT token (get it from `/auth/login`)
+4. Test endpoints directly from the browser!
+
+**Available Endpoint Groups:**
+- **Authentication**: Register, login, profile management
+- **Clients**: Full CRUD operations with pagination and search
+
 ## Environment Variables
 
 All environment variables are **validated at startup** using `class-validator`. The application will refuse to start if any required variable is missing or invalid.
@@ -172,7 +196,7 @@ npm run test:debug
 
 **Postman Collection** is available in the `postman/` directory with automatic JWT token management.
 
-📁 **Files:**
+**Files:**
 - `postman/Micro-CRM-Backend.postman_collection.json` - API collection with built-in documentation
 - `postman/Micro-CRM-Backend.postman_environment.json` - Environment variables
 
@@ -186,10 +210,14 @@ See [postman/README.md](postman/README.md) for technical details.
 
 **Available Endpoints:**
 
-- ✅ `POST /auth/register` - Register new user
-- ✅ `POST /auth/login` - Login and get JWT token
-- ✅ `GET /auth/profile` - Get current user (protected)
-- ⏳ Clients CRUD endpoints (coming in Phase 3)
+- `POST /auth/register` - Register new user
+- `POST /auth/login` - Login and get JWT token
+- `GET /auth/profile` - Get current user (protected)
+- `POST /clients` - Create new client (protected)
+- `GET /clients` - List clients with pagination and search (protected)
+- `GET /clients/:id` - Get single client (protected)
+- `PATCH /clients/:id` - Update client (protected)
+- `DELETE /clients/:id` - Delete client (protected)
 
 ## Database Management
 
@@ -329,11 +357,36 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
 - ✅ Task 2.8: Create authentication guard
 - ✅ Task 2.9: Add error handling
 
-### Next Phase: Clients Module
+### Phase 3: Clients Module ✅
 
-- Task 3.1: Create Client entity
-- Task 3.2: Generate and run Client migration
-- Task 3.3-3.10: Implement Clients CRUD endpoints
+- ✅ Task 3.1: Create Client entity
+- ✅ Task 3.2: Generate and run Client migration
+- ✅ Task 3.3-3.10: Implement Clients CRUD endpoints with pagination and search
+- ✅ Task 3.11: Add comprehensive error handling
+- ✅ Task 3.12: Add unit tests for ClientsService
+- ✅ Task 3.13: Add E2E tests for Clients endpoints
+- ✅ Task 3.14: Update documentation
+
+### Phase 4: API Documentation with Swagger ✅
+
+- ✅ Task 4.1: Install and configure @nestjs/swagger
+- ✅ Task 4.2: Add Swagger decorators to Auth endpoints
+- ✅ Task 4.3: Add Swagger decorators to Clients endpoints
+- ✅ Task 4.4: Add API examples and descriptions
+- ✅ Task 4.5: Configure JWT Bearer authentication in Swagger
+- ✅ Task 4.6: Update README with Swagger documentation
+
+**Swagger Features:**
+- Interactive API documentation at `/api`
+- Request/response examples for all endpoints
+- Built-in JWT authentication testing
+- Automatic validation documentation from DTOs
+
+### Next Phase: Deployment Preparation
+
+- Task 5.1: Add health check endpoint
+- Task 5.2: Configure CORS properly
+- Task 5.3: Add deployment documentation
 
 ## Project Structure
 
@@ -341,12 +394,17 @@ npx typeorm-ts-node-commonjs migration:show -d src/data-source.ts
 micro-crm-be/
 ├── src/
 │   ├── auth/                 # Authentication module
-│   │   ├── dto/              # Data transfer objects
+│   │   ├── dto/              # Data transfer objects (with Swagger decorators)
 │   │   ├── guards/           # JWT auth guard
 │   │   ├── decorators/       # Custom decorators (@CurrentUser)
 │   │   ├── strategies/       # Passport JWT strategy
 │   │   ├── interfaces/       # JWT payload interface
 │   │   └── utils/            # Password hashing utilities
+│   ├── clients/              # Clients module
+│   │   ├── dto/              # Data transfer objects (with Swagger decorators)
+│   │   ├── entities/         # Client entity
+│   │   ├── clients.controller.ts  # Clients controller (with Swagger docs)
+│   │   └── clients.service.ts     # Clients service
 │   ├── users/                # Users module
 │   │   ├── entities/         # User entity
 │   │   ├── enums/            # AuthProvider, SubscriptionPlan
@@ -357,7 +415,7 @@ micro-crm-be/
 │   │   └── env.validation.ts # Environment variable validation
 │   ├── migrations/           # TypeORM migrations
 │   ├── app.module.ts         # Root application module
-│   ├── main.ts               # Application entry point
+│   ├── main.ts               # Application entry point (with Swagger setup)
 │   └── data-source.ts        # TypeORM DataSource configuration
 ├── postman/                  # Postman collection for API testing
 │   ├── Micro-CRM-Backend.postman_collection.json
