@@ -1,2 +1,2 @@
-export * from './create-client.dto';
-export * from './update-client.dto';
+export * from 'src/clients/dto/create-client.dto';
+export * from 'src/clients/dto/update-client.dto';

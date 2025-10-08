@@ -1,1 +1,1 @@
-export { Client } from './client.entity';
+export { Client } from 'src/clients/entities/client.entity';

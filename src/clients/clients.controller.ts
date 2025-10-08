@@ -10,10 +10,10 @@ import {
   Query,
   ParseIntPipe,
 } from '@nestjs/common';
-import { ClientsService } from './clients.service';
-import { CreateClientDto, UpdateClientDto } from './dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { ClientsService } from 'src/clients/clients.service';
+import { CreateClientDto, UpdateClientDto } from 'src/clients/dto';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
+import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 @Controller('clients')
 @UseGuards(JwtAuthGuard)
