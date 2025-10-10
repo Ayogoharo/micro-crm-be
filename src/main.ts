@@ -1,11 +1,27 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from 'src/app.module';
 import { AllExceptionsFilter } from 'src/common/filters';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  const configService = app.get(ConfigService);
+  const logger = new Logger('Bootstrap');
+
+  // Enable CORS
+  const frontendHost =
+    configService.get<string>('FRONTEND_HOST') || 'localhost';
+  const frontendPort = configService.get<number>('FRONTEND_PORT') || 3000;
+  const corsOrigin = `http://${frontendHost}:${frontendPort}`;
+  app.enableCors({
+    origin: corsOrigin,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  });
+  logger.log(`CORS enabled for origin: ${corsOrigin}`);
 
   // Enable global validation pipe
   app.useGlobalPipes(
@@ -26,6 +42,7 @@ async function bootstrap() {
       'A comprehensive CRM API for local service businesses. Manage clients, appointments, reminders, and invoices with ease.',
     )
     .setVersion('1.0')
+    .addTag('Health', 'Health check and API status endpoints')
     .addTag('Authentication', 'User registration and authentication endpoints')
     .addTag('Clients', 'Client management CRUD operations')
     .addBearerAuth(
@@ -44,6 +61,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(process.env.PORT ?? 3000);
+  const port = configService.get<number>('PORT') || 3000;
+  await app.listen(port);
+  logger.log(`Application is running on: http://localhost:${port}`);
+  logger.log(
+    `Swagger documentation available at: http://localhost:${port}/api`,
+  );
 }
 void bootstrap();

@@ -24,6 +24,14 @@ export class EnvironmentVariables {
   PORT: number = 3000;
 
   @IsString()
+  FRONTEND_HOST: string = 'localhost';
+
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  FRONTEND_PORT: number = 3000;
+
+  @IsString()
   DATABASE_HOST: string = 'localhost';
 
   @IsNumber()
@@ -44,10 +52,7 @@ export class EnvironmentVariables {
   JWT_SECRET: string = '';
 
   @IsString()
-  JWT_EXPIRES_IN: string = '7d';
-
-  @IsString()
-  CORS_ORIGIN: string = 'http://localhost:5173';
+  JWT_EXPIRES_IN: string = '15m';
 }
 
 export function validate(config: Record<string, unknown>) {
