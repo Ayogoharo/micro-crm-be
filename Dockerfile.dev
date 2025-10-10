@@ -1,0 +1,25 @@
+FROM node:20-alpine
+
+# Install dumb-init for proper signal handling
+RUN apk add --no-cache dumb-init
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+
+# Install dependencies (including dev dependencies for development)
+RUN npm ci
+
+# Copy source code
+COPY . .
+
+# Expose application port
+EXPOSE 4000
+
+# Use dumb-init to handle signals properly
+ENTRYPOINT ["dumb-init", "--"]
+
+# Run in development mode with watch
+CMD ["npm", "run", "start:dev"]

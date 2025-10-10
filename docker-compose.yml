@@ -4,18 +4,54 @@ services:
     container_name: micro-crm-postgres
     restart: unless-stopped
     ports:
-      - '5434:5432'
+      - '${DATABASE_PORT:-5434}:5432'
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: micro_crm
+      POSTGRES_USER: ${DATABASE_USER:-postgres}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      POSTGRES_DB: ${DATABASE_NAME:-micro_crm}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      test: ['CMD-SHELL', 'pg_isready -U ${DATABASE_USER:-postgres}']
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - micro-crm-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: micro-crm-backend
+    restart: unless-stopped
+    ports:
+      - '${PORT:-4000}:${PORT:-4000}'
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: ${PORT:-4000}
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      DATABASE_USER: ${DATABASE_USER:-postgres}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD:-postgres}
+      DATABASE_NAME: ${DATABASE_NAME:-micro_crm}
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-7d}
+      FRONTEND_HOST: ${FRONTEND_HOST:-localhost}
+      FRONTEND_PORT: ${FRONTEND_PORT:-3000}
+    volumes:
+      - ./src:/app/src
+      - ./test:/app/test
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - micro-crm-network
+
+networks:
+  micro-crm-network:
+    driver: bridge
 
 volumes:
   postgres_data:
