@@ -8,6 +8,49 @@ import { hashPassword } from '../auth/utils/hash.util';
 import dataSource from '../data-source';
 
 /**
+ * Safety check to prevent seeding in production environment.
+ * @throws {Error} If running in production environment.
+ */
+function checkEnvironmentSafety(): void {
+  const nodeEnv = process.env.NODE_ENV?.toLowerCase();
+
+  // Block production environment
+  if (nodeEnv === 'production') {
+    throw new Error(
+      '❌ SAFETY CHECK FAILED: Cannot run database seeding in production environment!\n' +
+        '   This operation would delete all production data.\n' +
+        '   If you really need to seed data, change NODE_ENV first.',
+    );
+  }
+
+  // Warn if NODE_ENV is not set
+  if (!nodeEnv) {
+    console.warn(
+      '⚠️  WARNING: NODE_ENV is not set. Proceeding with caution...\n',
+    );
+  }
+
+  // Additional database name check for extra safety
+  const dbName = process.env.DATABASE_NAME || 'micro_crm';
+  const dangerousDbNames = ['production', 'prod', 'live'];
+
+  if (dangerousDbNames.some((name) => dbName.toLowerCase().includes(name))) {
+    throw new Error(
+      `❌ SAFETY CHECK FAILED: Database name "${dbName}" appears to be a production database!\n` +
+        '   Seeding is not allowed on production databases.\n' +
+        '   Please verify your DATABASE_NAME environment variable.',
+    );
+  }
+
+  // Display environment info
+  console.log('🔒 Environment Safety Check:');
+  console.log(`   • NODE_ENV: ${nodeEnv || 'NOT SET'}`);
+  console.log(`   • Database: ${dbName}`);
+  console.log(`   • Host: ${process.env.DATABASE_HOST || 'localhost'}`);
+  console.log('   ✅ Safety checks passed\n');
+}
+
+/**
  * Generate a random number of clients for each user (between 8 and 25)
  */
 function getRandomClientCount(): number {
@@ -74,6 +117,9 @@ async function seed() {
   let connection: DataSource | null = null;
 
   try {
+    // Run safety checks before any database operations
+    checkEnvironmentSafety();
+
     // Initialize database connection
     console.log('🔌 Connecting to database...');
     connection = await dataSource.initialize();
