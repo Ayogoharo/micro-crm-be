@@ -1,6 +1,9 @@
 import { IsEmail, IsNotEmpty, IsString, MinLength } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Data transfer object for user registration.
+ */
 export class RegisterDto {
   @ApiProperty({
     description: 'User email address',

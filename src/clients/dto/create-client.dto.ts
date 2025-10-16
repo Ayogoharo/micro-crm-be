@@ -7,6 +7,9 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+/**
+ * Data transfer object for creating a new client.
+ */
 export class CreateClientDto {
   @ApiProperty({
     description: 'Client full name',

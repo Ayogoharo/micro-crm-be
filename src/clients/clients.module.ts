@@ -4,6 +4,9 @@ import { ClientsController } from 'src/clients/clients.controller';
 import { ClientsService } from 'src/clients/clients.service';
 import { Client } from 'src/clients/entities/client.entity';
 
+/**
+ * Module for managing client records.
+ */
 @Module({
   imports: [TypeOrmModule.forFeature([Client])],
   controllers: [ClientsController],

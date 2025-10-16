@@ -8,12 +8,18 @@ import {
   validateSync,
 } from 'class-validator';
 
+/**
+ * Supported runtime environments.
+ */
 enum Environment {
   Development = 'development',
   Production = 'production',
   Test = 'test',
 }
 
+/**
+ * Environment variables schema with validation rules.
+ */
 export class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment = Environment.Development;
@@ -55,6 +61,10 @@ export class EnvironmentVariables {
   JWT_EXPIRES_IN: string = '15m';
 }
 
+/**
+ * Validates environment variables against the schema.
+ * @throws {Error} If validation fails.
+ */
 export function validate(config: Record<string, unknown>) {
   const validatedConfig = plainToInstance(EnvironmentVariables, config, {
     enableImplicitConversion: true,

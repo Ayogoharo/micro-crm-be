@@ -8,6 +8,9 @@ import { AuthModule } from 'src/auth/auth.module';
 import { UsersModule } from 'src/users/users.module';
 import { ClientsModule } from 'src/clients/clients.module';
 
+/**
+ * Root application module orchestrating all feature modules and infrastructure.
+ */
 @Module({
   imports: [
     ConfigModule.forRoot({
