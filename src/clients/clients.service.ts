@@ -4,6 +4,9 @@ import { Repository, ILike, FindOptionsWhere } from 'typeorm';
 import { Client } from 'src/clients/entities/client.entity';
 import { CreateClientDto, UpdateClientDto } from 'src/clients/dto';
 
+/**
+ * Service for managing client records.
+ */
 @Injectable()
 export class ClientsService {
   constructor(
@@ -11,6 +14,9 @@ export class ClientsService {
     private readonly clientRepository: Repository<Client>,
   ) {}
 
+  /**
+   * Creates a new client for the specified user.
+   */
   async create(
     createClientDto: CreateClientDto,
     userId: string,
@@ -22,6 +28,9 @@ export class ClientsService {
     return this.clientRepository.save(client);
   }
 
+  /**
+   * Retrieves paginated list of clients for the specified user with optional search.
+   */
   async findAll(
     userId: string,
     page: number = 1,
@@ -50,6 +59,10 @@ export class ClientsService {
     };
   }
 
+  /**
+   * Finds a single client by ID for the specified user.
+   * @throws {NotFoundException} If client not found or belongs to different user.
+   */
   async findOne(id: string, userId: string): Promise<Client> {
     const client = await this.clientRepository.findOne({
       where: { id, userId },
@@ -62,6 +75,10 @@ export class ClientsService {
     return client;
   }
 
+  /**
+   * Updates an existing client.
+   * @throws {NotFoundException} If client not found or belongs to different user.
+   */
   async update(
     id: string,
     updateClientDto: UpdateClientDto,
@@ -72,6 +89,10 @@ export class ClientsService {
     return this.clientRepository.save(client);
   }
 
+  /**
+   * Deletes a client.
+   * @throws {NotFoundException} If client not found or belongs to different user.
+   */
   async remove(id: string, userId: string): Promise<void> {
     const client = await this.findOne(id, userId);
     await this.clientRepository.remove(client);

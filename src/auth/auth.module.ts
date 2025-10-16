@@ -7,6 +7,9 @@ import { AuthController } from 'src/auth/auth.controller';
 import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 import { UsersModule } from 'src/users/users.module';
 
+/**
+ * Authentication module handling user registration, login, and JWT validation.
+ */
 @Module({
   imports: [
     UsersModule,
