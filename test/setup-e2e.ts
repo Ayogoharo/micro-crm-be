@@ -10,8 +10,11 @@ import { DataSource } from 'typeorm';
 import * as dotenv from 'dotenv';
 import * as path from 'path';
 
-// Load test environment variables
-dotenv.config({ path: path.resolve(__dirname, '../.env.test') });
+// Load test environment variables with override to ensure .env.test takes precedence
+dotenv.config({
+  path: path.resolve(__dirname, '../.env.test'),
+  override: true,
+});
 
 export default async function globalSetup() {
   console.log('🔧 E2E Test Setup: Initializing test database...');

@@ -16,7 +16,9 @@ import { ClientsModule } from 'src/clients/clients.module';
     ConfigModule.forRoot({
       isGlobal: true,
       validate,
-      cache: true,
+      cache: process.env.NODE_ENV !== 'test', // Disable cache in test environment
+      envFilePath: process.env.NODE_ENV === 'test' ? '.env.test' : '.env',
+      ignoreEnvFile: process.env.NODE_ENV === 'test', // In test, rely on process.env set by setup-env.ts
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],

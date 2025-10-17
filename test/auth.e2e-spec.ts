@@ -95,7 +95,7 @@ describe('Authentication (e2e)', () => {
       const body = response.body as ErrorResponse;
 
       expect(response.body).toHaveProperty('message');
-      expect(body.message).toContain('already exists');
+      expect(body.message).toContain('already registered');
     });
 
     /**
@@ -318,6 +318,10 @@ describe('Authentication (e2e)', () => {
       const user = await registerUser(app);
 
       const login1 = await loginUser(app, user.email, user.password);
+
+      // Wait 1 second to ensure different iat (issued at) timestamp
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const login2 = await loginUser(app, user.email, user.password);
 
       expect(login1.token).not.toBe(login2.token);

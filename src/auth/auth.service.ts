@@ -19,11 +19,13 @@ export class AuthService {
 
   /**
    * Register a new user with email and password
+   * Automatically logs in the user by generating a JWT token
    * @throws {ConflictException} if email already exists
    */
-  async register(
-    registerDto: RegisterDto,
-  ): Promise<{ user: { id: string; email: string; plan: string } }> {
+  async register(registerDto: RegisterDto): Promise<{
+    access_token: string;
+    user: { id: string; email: string; plan: string };
+  }> {
     const { email, password } = registerDto;
 
     // Check if user already exists
@@ -38,8 +40,17 @@ export class AuthService {
     // Create user
     const user = await this.usersService.create(email, passwordHash);
 
-    // Return user without password hash
+    // Generate JWT token for auto-login
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+    };
+
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    // Return user and access token
     return {
+      access_token: accessToken,
       user: {
         id: user.id,
         email: user.email,

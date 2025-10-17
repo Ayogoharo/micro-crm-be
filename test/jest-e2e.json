@@ -13,5 +13,6 @@
   "globalTeardown": "<rootDir>/teardown-e2e.ts",
   "testTimeout": 30000,
   "maxWorkers": 1,
-  "verbose": true
+  "verbose": true,
+  "setupFiles": ["<rootDir>/setup-env.ts"]
 }

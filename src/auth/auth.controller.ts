@@ -30,20 +30,22 @@ export class AuthController {
 
   /**
    * Registers a new user account with email and password.
+   * Automatically logs in the user by generating a JWT token.
    */
   @Post('register')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({
     summary: 'Register a new user',
     description:
-      'Creates a new user account with email and password. Returns user data without password.',
+      'Creates a new user account with email and password. Automatically logs in the user and returns JWT access token.',
   })
   @ApiBody({ type: RegisterDto })
   @ApiResponse({
     status: 201,
-    description: 'User successfully registered',
+    description: 'User successfully registered and logged in',
     schema: {
       example: {
+        access_token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
         user: {
           id: 'uuid',
           email: 'user@example.com',

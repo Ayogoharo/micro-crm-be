@@ -9,6 +9,7 @@ import {
   UseGuards,
   Query,
   ParseIntPipe,
+  ParseUUIDPipe,
   HttpCode,
   HttpStatus,
 } from '@nestjs/common';
@@ -147,8 +148,12 @@ export class ClientsController {
     },
   })
   @ApiResponse({ status: 404, description: 'Client not found' })
+  @ApiResponse({ status: 400, description: 'Invalid UUID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  findOne(@Param('id') id: string, @CurrentUser('id') userId: string) {
+  findOne(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
     return this.clientsService.findOne(id, userId);
   }
 
@@ -177,10 +182,13 @@ export class ClientsController {
     },
   })
   @ApiResponse({ status: 404, description: 'Client not found' })
-  @ApiResponse({ status: 400, description: 'Validation failed' })
+  @ApiResponse({
+    status: 400,
+    description: 'Validation failed or invalid UUID format',
+  })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   update(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() updateClientDto: UpdateClientDto,
     @CurrentUser('id') userId: string,
   ) {
@@ -197,8 +205,12 @@ export class ClientsController {
   @ApiParam({ name: 'id', type: String, description: 'Client UUID' })
   @ApiResponse({ status: 204, description: 'Client deleted successfully' })
   @ApiResponse({ status: 404, description: 'Client not found' })
+  @ApiResponse({ status: 400, description: 'Invalid UUID format' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  remove(@Param('id') id: string, @CurrentUser('id') userId: string) {
+  remove(
+    @Param('id', ParseUUIDPipe) id: string,
+    @CurrentUser('id') userId: string,
+  ) {
     return this.clientsService.remove(id, userId);
   }
 }

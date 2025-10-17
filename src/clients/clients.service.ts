@@ -37,7 +37,11 @@ export class ClientsService {
     limit: number = 10,
     search?: string,
   ): Promise<{ data: Client[]; total: number; page: number; limit: number }> {
-    const skip = (page - 1) * limit;
+    // Ensure page and limit are positive numbers
+    const safePage = Math.max(1, page);
+    const safeLimit = Math.max(1, limit);
+    const skip = (safePage - 1) * safeLimit;
+
     const where: FindOptionsWhere<Client> = { userId };
 
     if (search) {
@@ -47,15 +51,15 @@ export class ClientsService {
     const [data, total] = await this.clientRepository.findAndCount({
       where,
       skip,
-      take: limit,
+      take: safeLimit,
       order: { createdAt: 'DESC' },
     });
 
     return {
       data,
       total,
-      page,
-      limit,
+      page: safePage,
+      limit: safeLimit,
     };
   }
 
